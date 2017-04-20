@@ -1,3 +1,4 @@
+
 import webbrowser
 import time
 import os
@@ -34,7 +35,7 @@ def get_data(bucket_start_date,bucket_end_date, keyword):
     bucket_end_date_printed = datetime.strftime(bucket_end_date, '%Y-%m-%d')
     time_formatted = bucket_start_date_printed + '+' + bucket_end_date_printed
 
-    req = {"comparisonItem":[{"keyword":keyword, "geo":geo, "time": time_formatted}], "category":category,"property":""}
+    req = {"comparisonItem":[{"keyword":keyword, "geo":'', "time": time_formatted}], "category":22,"property":""}
     hl = "en-GB"
     tz = "-120"
 
@@ -89,13 +90,13 @@ def get_daily_frames(start_date, end_date, keyword):
 def get_weekly_frame(start_date, end_date, keyword):
 
     if datetime.strptime(start_date, '%Y-%m-%d') > datetime.strptime(end_date, '%Y-%m-%d') - timedelta(days=180):
-        print 'No need to stitch; your time interval is short enough. '
+        print('No need to stitch; your time interval is short enough. ')
         return None
     else:
         resp_text = get_data(datetime.strptime(start_date, '%Y-%m-%d'), datetime.strptime(end_date, '%Y-%m-%d'), keyword)
         return parse_csv(get_csv(resp_text))
 
-def stitch_frames(daily_frames, weekly_frame):
+def stitch_frames(daily_frames, weekly_frame, keywords):
 
     daily_frame = pd.concat(daily_frames, ignore_index = True)
 
@@ -131,10 +132,16 @@ def stitch_frames(daily_frames, weekly_frame):
     final_data_frame.to_csv('{0}.csv'.format(keywords.replace('+','')), sep=',')
 
 
+#def scrape(keywords, start_date, end_date, category=22, geo=''):
+    #daily_frames = get_daily_frames(start_date, end_date, keywords)
+    #weekly_frame = get_weekly_frame(start_date, end_date, keywords)
+
+    #return stitch_frames(daily_frames, weekly_frame, keywords)
+
 if __name__ == '__main__':
     # TODO: should work even though number of buckets is only 1
-    start_date = sys.argv[1]
-    end_date = sys.argv[2]
+    start_date = sys.argv[1] # 'YYYY-MM-DD'
+    end_date = sys.argv[2] # 'YYYY-MM-DD'
     geo = ''
     category = 22
     keywords = '+'.join(sys.argv[3:])
@@ -142,4 +149,4 @@ if __name__ == '__main__':
     daily_frames = get_daily_frames(start_date, end_date, keywords)
     weekly_frame = get_weekly_frame(start_date, end_date, keywords)
 
-    stitch_frames(daily_frames, weekly_frame)
+    stitch_frames(daily_frames, weekly_frame, keywords)
