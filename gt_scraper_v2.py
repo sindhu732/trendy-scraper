@@ -61,7 +61,7 @@ def get_csv(response_text):
     return csv.text.encode('utf8')
 
 def parse_csv(csv_contents):
-    lines = csv_contents.split('\n')
+    lines = csv_contents.decode('utf-8').split('\n')
     df = pd.DataFrame(columns = ['date','value'])
     dates = []
     values = []
@@ -132,7 +132,7 @@ def stitch_frames(daily_frames, weekly_frame):
 
 
 if __name__ == '__main__':
-
+    # TODO: should work even though number of buckets is only 1
     start_date = sys.argv[1]
     end_date = sys.argv[2]
     geo = ''
